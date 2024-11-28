@@ -18,8 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -91,10 +90,15 @@ class MyBlogApiControllerTest {
         result.andExpect(status().isOk())
         .andExpect(jsonPath("$.title").value("title 1"))
         .andExpect(jsonPath("$.content").value("content 1"));
+    }
 
-
-
-
+    @DisplayName("deleteArticle: 블로그 글 삭제에 성공한다.")
+    @Test
+    public void deleteArticle() throws Exception {
+        final String url = "/api/articles/{id}";
+        ResultActions result = mockMvc.perform(delete(url, 1L).contentType(MediaType.APPLICATION_JSON));
+        result.andExpect(status().isOk());
+        assertThat(blogRepository.findById(1L)).isEmpty();
     }
 
 }
