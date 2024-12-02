@@ -5,10 +5,14 @@ import me.shinsunyoung.springbootdeveloper_blog.service.UserDetailService;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -19,10 +23,10 @@ public class WebSecurityConfig {
 
     private final UserDetailService userDetailService;
 
-    /*
-    스프링 시큐리티 기능 비활성화
-    스프링 시큐리티 필터에서 H2 콘솔과 static 경로 요청을 무시.
-    즉, 위 요청들은 필터에서 제외한다.
+    /**
+     * 스프링 시큐리티의 보안 필터 체인에서 특정 요청을 제외(ignoring)하는 설정을 정의.
+     * - 이 설정은 보안이 필요하지 않은 요청(예: 정적 리소스, H2 콘솔)에 대해 스프링 시큐리티 필터가 적용되지 않도록 한다.
+     * @return WebSecurityCustomizer 객체로 보안 필터 체인에서 제외할 요청을 정의.
      */
     @Bean
     public WebSecurityCustomizer configure() {
@@ -63,4 +67,37 @@ public class WebSecurityConfig {
                 .build();
     }
 
+    /**
+     * 인증(Authentication)을 처리하는 AuthenticationManager 빈 생성.
+     * - DaoAuthenticationProvider : 데이터베이스에서 사용자 정보를 가져오고, 비밀번호를 검증.
+     * - BCryptPasswordEncoder : 암호화된 비밀번호를 비교.
+     * @param http                 HttpSecurity 객체, 시큐리티 설정과 연결. (아직 사용 안하고 있음)
+     * @param bCryptPasswordEncoder 비밀번호 암호화를 위한 인코더 빈.
+     * @param userDetailService     사용자 정보를 로드하는 서비스.
+     * @return 인증 매니저(AuthenticationManager) 빈.
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(
+            HttpSecurity http,
+            BCryptPasswordEncoder bCryptPasswordEncoder,
+            UserDetailService userDetailService) {
+        // 데이터베이스에서 사용자 정보와 비밀번호를 검증하는 Provider 생성
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailService); // 사용자 정보 로드
+        authProvider.setPasswordEncoder(bCryptPasswordEncoder); // 비밀번호 검증
+        // ProviderManager로 DaoAuthenticationProvider를 관리하며 AuthenticationManager 반환
+        return new ProviderManager(authProvider);
+    }
+
+    /**
+     * 비밀번호를 암호화하거나 검증할 때 사용할 BCryptPasswordEncoder 빈 생성.
+     * - 스프링 시큐리티에서 권장하는 비밀번호 암호화 방식 중 하나.
+     * - 암호화된 비밀번호와 입력 비밀번호를 비교해 검증.
+     * @return BCryptPasswordEncoder 인스턴스.
+     */
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        // BCrypt 알고리즘을 사용하는 암호화 인코더 반환
+        return new BCryptPasswordEncoder();
+    }
 }
