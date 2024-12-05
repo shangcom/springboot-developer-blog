@@ -25,7 +25,7 @@ public class WebSecurityConfig {
 
     /**
      * 스프링 시큐리티의 보안 필터 체인에서 특정 요청을 제외(ignoring)하는 설정을 정의.
-     * - 이 설정은 보안이 필요하지 않은 요청(예: 정적 리소스, H2 콘솔)에 대해 스프링 시큐리티 필터가 적용되지 않도록 한다.
+     * 보안이 필요하지 않은 요청(예: 정적 리소스, H2 콘솔)에 대해 스프링 시큐리티 필터가 적용되지 않도록 한다.
      * @return WebSecurityCustomizer 객체로 보안 필터 체인에서 제외할 요청을 정의.
      */
     @Bean
@@ -37,6 +37,7 @@ public class WebSecurityConfig {
 
     /*
     특정 HTTP 요청에 대한 웹 기반 보안 구성.
+    SecurityFilterChain을 빈으로 정의하여 보안 필터 체인을 명시적으로 구성.
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -61,8 +62,8 @@ public class WebSecurityConfig {
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login") // 로그아웃 성공 후 이동할 경로 지정.
                         .invalidateHttpSession(true)) // 로그아웃 시 세션을 무효화하여 보안성을 강화.
-                // CSRF 보호를 비활성화.
-                .csrf(AbstractHttpConfigurer::disable)
+                // CSRF 보호를 비활성화. 기본값이 활성화이므로 아래 코드 지우면 활성화됨.
+                .csrf(AbstractHttpConfigurer::disable) // http.csrf().disable()과 같음.
                 // 설정된 HttpSecurity를 기반으로 SecurityFilterChain 객체를 생성하여 반환.
                 .build();
     }
@@ -71,7 +72,8 @@ public class WebSecurityConfig {
      * 인증(Authentication)을 처리하는 AuthenticationManager 빈 생성.
      * - DaoAuthenticationProvider : 데이터베이스에서 사용자 정보를 가져오고, 비밀번호를 검증.
      * - BCryptPasswordEncoder : 암호화된 비밀번호를 비교.
-     * @param http                 HttpSecurity 객체, 시큐리티 설정과 연결. (아직 사용 안하고 있음)
+     *
+     * @param http                  HttpSecurity 객체, 시큐리티 설정과 연결. (아직 사용 안하고 있음)
      * @param bCryptPasswordEncoder 비밀번호 암호화를 위한 인코더 빈.
      * @param userDetailService     사용자 정보를 로드하는 서비스.
      * @return 인증 매니저(AuthenticationManager) 빈.
@@ -93,6 +95,7 @@ public class WebSecurityConfig {
      * 비밀번호를 암호화하거나 검증할 때 사용할 BCryptPasswordEncoder 빈 생성.
      * - 스프링 시큐리티에서 권장하는 비밀번호 암호화 방식 중 하나.
      * - 암호화된 비밀번호와 입력 비밀번호를 비교해 검증.
+     *
      * @return BCryptPasswordEncoder 인스턴스.
      */
     @Bean
