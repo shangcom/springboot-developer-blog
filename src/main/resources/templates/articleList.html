@@ -25,10 +25,12 @@
                 <h5 class="card-title" th:text="${item.getTitle()}"></h5>
                 <p class="card-text" th:text="${item.getContent()}"></p>
                 <a th:href="@{/articles/{id}(id=${item.id})}" class="btn btn-primary">보러 가기</a>
-                <!--"#" : 아직 링크 목적지 없어서 땜빵해둔 것. 클릭하면 페이지 맨 위로 스크롤됨.-->
             </div>
         </div>
+        </br>
     </div>
+    <button type="button" class="btn btn-secondary" onclick="location.href='/logout'">로그아웃</button>
 </div>
+<script rec="/js/article.js"></script>
 </body>
 </html>

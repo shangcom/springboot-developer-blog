@@ -61,7 +61,7 @@ public class WebSecurityConfig {
                 // 로그아웃 설정.
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login") // 로그아웃 성공 후 이동할 경로 지정.
-                        .invalidateHttpSession(true)) // 로그아웃 시 세션을 무효화하여 보안성을 강화.
+                        .invalidateHttpSession(true)) // 로그아웃 시 세션을 무효화.
                 // CSRF 보호를 비활성화. 기본값이 활성화이므로 아래 코드 지우면 활성화됨.
                 .csrf(AbstractHttpConfigurer::disable) // http.csrf().disable()과 같음.
                 // 설정된 HttpSecurity를 기반으로 SecurityFilterChain 객체를 생성하여 반환.
@@ -72,7 +72,6 @@ public class WebSecurityConfig {
      * 인증(Authentication)을 처리하는 AuthenticationManager 빈 생성.
      * - DaoAuthenticationProvider : 데이터베이스에서 사용자 정보를 가져오고, 비밀번호를 검증.
      * - BCryptPasswordEncoder : 암호화된 비밀번호를 비교.
-     *
      * @param http                  HttpSecurity 객체, 시큐리티 설정과 연결. (아직 사용 안하고 있음)
      * @param bCryptPasswordEncoder 비밀번호 암호화를 위한 인코더 빈.
      * @param userDetailService     사용자 정보를 로드하는 서비스.
