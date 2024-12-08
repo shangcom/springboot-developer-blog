@@ -23,12 +23,17 @@ public class UserApiController {
         return "redirect:/login"; // 회원 가입이 완료된 이후에 로그인 페이지로 이동
     }
 
+    /*
+    동일한 요청 메서드와 경로(/logout)에 대해 컨트롤러와 필터 체인이 모두 처리하려고 할 경우, 우선순위가 높은 컨트롤러가 요청을 먼저 처리.
+    여기서는 get, 체인에서는 post /logout 처리.
+    로그아웃 버튼이 get 요청을 보내는 href를 사용하고 있으므로 이 컨트롤러가 처리한다.
+     */
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response,
                 SecurityContextHolder.getContext().getAuthentication());
 
-        return "redirect:/login"; // 회원 가입이 완료된 이후에 로그인 페이지로 이동
+        return "redirect:/login";
     }
 
 }

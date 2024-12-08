@@ -41,7 +41,7 @@ public class User implements UserDetails {
         return List.of(new SimpleGrantedAuthority("user"));
     }
 
-    // 사용자의 id를 반환(고유한 값)
+    // 사용자의 고유한 이름 반환(고유한 값)
     @Override
     public String getUsername() {
         return email;
