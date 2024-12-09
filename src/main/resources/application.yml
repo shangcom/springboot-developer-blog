@@ -18,3 +18,9 @@ spring:
   h2:
     console:
       enabled: true
+
+#issuer : 토큰 발급자
+#secret_key : JWT 서명을 위한 비밀  키.토큰의 생성 및 검증 과정에서 사용
+jwt:
+  issuer: dndbs91@gmail.com
+  secret_key: study-springboot
