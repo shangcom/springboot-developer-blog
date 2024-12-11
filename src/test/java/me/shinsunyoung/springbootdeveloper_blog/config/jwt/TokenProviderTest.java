@@ -16,6 +16,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/*
+TokenProvider 클래스의 주요 메서드(generateToken, validToken, getAuthentication, getUserId)가 정상적으로 동작하는지 테스트.
+테스트는 JWT 라이브러리(JJWT)를 사용해 토큰을 생성, 파싱, 검증하며 결과를 비교.
+ */
 @SpringBootTest
 public class TokenProviderTest {
 
@@ -26,6 +30,10 @@ public class TokenProviderTest {
     @Autowired
     private JwtProperties jwtProperties;
 
+    /**
+     * 사용자 정보를 기반으로 JWT를 생성할 수 있는지 확인.
+     * 생성된 토큰에 사용자 ID가 올바르게 포함되어 있는지 검증.
+     */
     @DisplayName("generateToken() : 유저 정보와 만료 기간을 전달해 토큰을 만들 수 있다.")
     @Test
     void generateToken() {
@@ -47,6 +55,9 @@ public class TokenProviderTest {
         assertThat(userId).isEqualTo(testUser.getId());
     }
 
+    /**
+     * 만료된 토큰에 대해 유효성 검증이 실패하는지 확인.
+     */
     @DisplayName("validToken(): 만료된 토큰일 경우 유효성 검증에 실패한다.")
     @Test
     void validToken_invalidToken() {
@@ -57,18 +68,22 @@ public class TokenProviderTest {
                 .expiration(new Date(new Date().getTime() - Duration.ofDays(7).toMillis()))
                 .build().createToken(jwtProperties);
 
-        //when: 토큰 제공자의 validToken() 메서드를 호출해 유효한 토큰인지 검증한 뒤 결괏값을 반환받음.
+        //when: validToken 메서드를 호출하여 토큰 유효성 검사.
         boolean result = tokenProvider.validToken(token);
 
         //then: 반환값이 false(유효한 토큰이 아님)인 것을 확인.
         assertThat(result).isFalse();
     }
 
+    /**
+     * 토큰에서 인증 객체(Authentication)를 반환받을 수 있는지 확인.
+     * 반환된 인증 객체가 예상한 사용자 정보(이메일)를 포함하는지 확인.
+     */
     @DisplayName("getAuthentication(): 토큰 기반으로 인증 정보를 가져올 수 있다.")
     @Test
     void getAuthentication() {
         /*
-        given: jjwt 라이버리 사용해 토큰 생성. 토큰 제목(subject)는 userEmail으로 등록.
+        given: JwtFactory를 사용해 subject를 userEmail로 설정한 JWT 생성.
          */
         String userEmail = "user@gmail.com";
         String token = JwtFactory.builder()
@@ -79,16 +94,18 @@ public class TokenProviderTest {
         //when: tokenProvider의 getAutentication()으로 인증 객체 반환받음.
         Authentication autentication = tokenProvider.getAutentication(token);
 
-        //then: 반환받은 인증 객체의 유저 이름을 가져와 given절에서 설정한 subject 값인 "user@gmail.com"과 같은지 확인.
+        //then: 반환된 인증 객체의 사용자 이름이 토큰의 subject 값(userEmail)과 동일한지 확인.
         assertThat(((UserDetails) autentication.getPrincipal()).getUsername()).isEqualTo(userEmail);
     }
 
+    /**
+     * JWT의 클레임에 포함된 사용자 ID를 올바르게 추출할 수 있는지 확인.
+     */
     @DisplayName("getUserId(): 토큰으로 유저 ID를 가져올 수 있다.")
     @Test
     void getUserId() {
         /*
-        given: jjwt 라이브러리 사용해 토큰 생성.
-               + 클레임 추가 : key = "id", value = userId (값 1L)
+        given: JwtFactory를 사용해 클레임("id")에 사용자 ID(1L)를 포함한 JWT 생성.
          */
         Long userId = 1L;
         String token = JwtFactory.builder()
@@ -98,7 +115,7 @@ public class TokenProviderTest {
         //when: tokenProvider의 getUserId() 메서드로 유저 ID 반환받음.
         Long userIdByToken = tokenProvider.getUserId(token);
 
-        //then: 반환받은 유저ID가 given절에서 설정한 userId와 일치하는지 확인.
+        //then: 반환된 ID가 설정된 사용자 ID(1L)와 같은지 확인.
         assertThat(userIdByToken).isEqualTo(userId);
 
     }
