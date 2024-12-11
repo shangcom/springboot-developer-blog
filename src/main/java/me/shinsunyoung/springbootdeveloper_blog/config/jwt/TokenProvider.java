@@ -76,24 +76,37 @@ public class TokenProvider {
      * JWT를 파싱하여 사용자의 인증 정보를 추출.
      * 스프링 시큐리티의 Authentication 객체를 반환하여 인증 상태를 설정.
      * @param token
-     * @return
+     * @return UsernamePasswordAuthenticationToken : 인증 정보를 담는 Authentication 객체의 구현체.
      */
     public Authentication getAutentication(String token) {
         Claims claims = getClaims(token); // JWT의 페이로드 추출
+        /*
+         현재 코드는 사용자의 권한을 "ROLE_USER"라는 고정된 값으로 설정. JWT에서 실제 권한 정보를 추출하지 않고, 모든 사용자에게 동일한 권한을 부여.
+         제대로 하려면 JWT에서 권한 정보 추출해서 동적으로 권한 설정해야함.
+         */
         Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")); // 사용자 권한 설정
 
+        /*
+        principal: 인증된 사용자 정보(예: 사용자 ID, 이메일 등).
+        credentials: 인증 시 사용되는 비밀번호. 인증 후에는 일반적으로 빈 문자열로 설정됨.
+        authorities: 사용자의 권한 정보(예: ROLE_USER, ROLE_ADMIN 등). GrantedAuthority 인터페이스를 구현한 객체(SimpleGrantedAuthority 등)로 전달.
+
+         */
         return new UsernamePasswordAuthenticationToken(
                 new org.springframework.security.core.userdetails.User(claims.getSubject(), "", authorities),// 사용자 정보
                 token, authorities);// 인증 토큰 반환
     }
 
+    /*
+    토큰 기반으로 유저 ID를 가져오는 메서드.
+     */
     public Long getUserId(String token) {
         Claims claims = getClaims(token);
         return claims.get("id", Long.class);
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parser()
+        return Jwts.parser() // 클레임 조회
                 .setSigningKey(jwtProperties.getSecretKey())
                 .parseClaimsJws(token)
                 .getBody();
