@@ -52,7 +52,8 @@ public class TokenProvider {
                 .setExpiration(expiry) // 만료 시간
                 .setSubject(user.getEmail()) // 사용자의 식별자
                 .claim("id", user.getId()) // 추가 클레임
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey()) // 서명
+                // 서명. 비밀값과 함께 해시값ㅇ르 HS256 방식으로 암호화.
+                .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
                 .compact(); // 최종적으로 JWT 문자열 생성
     }
 
@@ -75,7 +76,6 @@ public class TokenProvider {
     /**
      * JWT를 파싱하여 사용자의 인증 정보를 추출.
      * 스프링 시큐리티의 Authentication 객체를 반환하여 인증 상태를 설정.
-     * @param token
      * @return UsernamePasswordAuthenticationToken : 인증 정보를 담는 Authentication 객체의 구현체.
      */
     public Authentication getAutentication(String token) {

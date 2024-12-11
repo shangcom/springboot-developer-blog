@@ -21,7 +21,12 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
 
     implementation 'io.jsonwebtoken:jjwt:0.9.1' // JWT 생성, 서명, 검증. JWT 기반 인증 및 권한 부여 구현
-    implementation 'javax.xml.bind:jaxb-api:2.31.' // Java 객체와 XML 간 변환. Java 11 이후 JJWT의 XML 작업 호환성을 보장
+
+    /*
+     Java 객체와 XML 간 변환. Java 11 이후 JJWT의 XML 작업 호환성을 보장.
+     javax.xml.bind 패키지가 Java 9 이상부터 JDK에서 제거됐기 때문에 수동으로 추가해줌.
+     */
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
     annotationProcessor 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok'
